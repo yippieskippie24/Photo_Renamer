@@ -6,8 +6,8 @@ import logging
 from datetime import datetime, date
 
 # Set the source and destination directories, as well as the desired filename prefix
-source_dir = "/Users/tmj/Downloads/import_test" # Replace with the path to your folder
-destination_dir = "/Users/tmj/Downloads/import_test/Organize_Photos"
+source_dir = "/Users/tmj/Pictures/Import" # Replace with the path to your folder
+destination_dir = "/Users/tmj/Pictures/Import/Organize_Photos"
 prefix = "TMJ" # Replace with your desired prefix
 
 # Map of camera brands to desired camera ID strings (used in filenames)
