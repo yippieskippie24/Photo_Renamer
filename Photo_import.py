@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os
+import re
 import subprocess
 import logging
 from datetime import datetime, date
@@ -60,16 +61,20 @@ for filename in os.listdir(source_dir):
             camera_make = output.split(":", 1)[1].strip()
             logging.debug(f"camera_make: {camera_make}")
             
+            # Get the original sequence number of the file
+            match = re.search(r'\d+', filename) # Matches one or more digits
+            original_shoot_sequence = match.group()
+            
             # Get the desired camera ID string for the current image based on its camera brand (using the camera_id_map)
             camera_id = camera_id_map.get(camera_make, "Unknown")
             logging.debug(f"camera_id: {camera_id}")
-            image_files.append((filename, img_path, capture_time, capture_date, file_extension, camera_id))
+            image_files.append((filename, img_path, capture_time, capture_date, file_extension, camera_id, original_shoot_sequence))
         except Exception as e:
             logging.error(f"Error processing {filename}: {e}")
 
 logging.info(f"image_files: {image_files}")
 # Sort image files by capture time
-image_files.sort(key=lambda x: x[2])
+image_files.sort(key=lambda x: x[6])
 
 # Rename image files function
 def rename_image_files(image_files, camera_id_string):
@@ -78,8 +83,9 @@ def rename_image_files(image_files, camera_id_string):
     prev_capture_date = None # Initialize previous capture date
     prev_capture_time = None # Initialize previous capture time
     prev_sequence_number = None # Initialize previous sequence number
+    prev_original_shoot_sequence = None # Initalize previous file_extension
     
-    for filename, img_path, capture_time, capture_date, file_extension, camera_id in image_files:
+    for filename, img_path, capture_time, capture_date, file_extension, camera_id, original_shoot_sequence in image_files:
         try:
             # Check if the file's camera_id matches the provided value
             if camera_id_string != camera_id:
@@ -95,9 +101,9 @@ def rename_image_files(image_files, camera_id_string):
             logging.debug(f"Sequence_number: {sequence_number}")
             
             # Assign sequence number to current file
-            if prev_capture_time is not None and prev_capture_time == capture_time:
+            if original_shoot_sequence is not None and prev_original_shoot_sequence == original_shoot_sequence:
                 sequence_number -= 1
-            prev_capture_time = capture_time
+            prev_original_shoot_sequence = original_shoot_sequence
             
             
             # Rename File useing the info gathered and move to the soure directory
